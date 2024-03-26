@@ -3,7 +3,7 @@
 This is the official implementation of the [DefVisTR paper](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9746665):
 
 <p align="center">
-<img src="https://user-images.githubusercontent.com/16319629/110786946-b99aa080-82a7-11eb-98e4-85478ca4eeac.png" width="600">
+<img src="https://github.com/skrya/skrya.github.io/blob/master/images/Defvistr.png" width="600">
 </p>
 
 
@@ -53,21 +53,22 @@ VisTR
 ├── models
 ...
 ```
-
-Download the pretrained deformable DETR models [Defomable DeTR Repository (44.5 AP)](https://github.com/fundamentalvision/Deformable-DETR/tree/main) on COCO and save it to the pretrained path.
-
 ### Compile CUDA operators
 ```
 cd ./models/ops
 sh ./make.sh
 # unit test (should see all checking is True)
 python test.py
+
+Download the pretrained deformable DETR models [Defomable DeTR Repository (44.5 AP)](https://github.com/fundamentalvision/Deformable-DETR/tree/main) on COCO and save it to the pretrained path.
+
+
 ```
 ### Training
 
 Training of the model requires 4 GPU cards with each 15GB.
 
-To train baseline VisTR on a single node with 4 gpus for 60 epochs (Bsz 1), trains in 1 day 10:28 hrs:
+To train baseline VisTR on a single node with 4 gpus for 50 epochs (Bsz 1):
 
 ```
 python -m torch.distributed.launch --nproc_per_node=4 --use_env main.py --backbone resnet50 --ytvos_path /mnt/data/ytvis/ --masks --pretrained_weights ../VisTR/<deformable_detr_coco_r50>.pth
