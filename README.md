@@ -1,6 +1,6 @@
-## VisTR: End-to-End Video Instance Segmentation with Transformers
+## Deformable vistr: Spatio temporal deformable attention for video instance segmentation
 
-This is the official implementation of the [VisTR paper](https://arxiv.org/abs/2011.14503):
+This is the official implementation of the [DefVisTR paper](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9746665):
 
 <p align="center">
 <img src="https://user-images.githubusercontent.com/16319629/110786946-b99aa080-82a7-11eb-98e4-85478ca4eeac.png" width="600">
@@ -11,7 +11,7 @@ This is the official implementation of the [VisTR paper](https://arxiv.org/abs/2
 We provide instructions how to install dependencies via conda.
 First, clone the repository locally:
 ```
-git clone https://github.com/Epiphqny/vistr.git
+git clone https://github.com/skrya/DefVIS.git
 ```
 Then, install PyTorch 1.6 and torchvision 0.7:
 ```
@@ -27,6 +27,14 @@ Compile DCN module(requires GCC>=5.3, cuda>=10.0)
 ```
 cd models/dcn
 python setup.py build_ext --inplace
+```
+
+### Compiling CUDA operators
+```bash
+cd ./models/ops
+sh ./make.sh
+# unit test (should see all checking is True)
+python test.py
 ```
 
 ### Preparation
@@ -46,7 +54,7 @@ VisTR
 ...
 ```
 
-Download the pretrained DETR models [Google Drive](https://drive.google.com/drive/folders/1DlN8uWHT2WaKruarGW2_XChhpZeI9MFG?usp=sharing) [BaiduYun](https://pan.baidu.com/s/12omUNDRjhAeGZ5olqQPpHA)(passcode:alge) on COCO and save it to the pretrained path.
+Download the pretrained deformable DETR models [Defomable DeTR Repository (44.5 AP)](https://github.com/fundamentalvision/Deformable-DETR/tree/main) on COCO and save it to the pretrained path.
 
 ### Compile CUDA operators
 ```
@@ -62,7 +70,7 @@ Training of the model requires 4 GPU cards with each 15GB.
 To train baseline VisTR on a single node with 4 gpus for 60 epochs (Bsz 1), trains in 1 day 10:28 hrs:
 
 ```
-python -m torch.distributed.launch --nproc_per_node=4 --use_env main.py --backbone resnet50 --ytvos_path /mnt/data/ytvis/ --masks --pretrained_weights ../VisTR/384_coco_r50.pth
+python -m torch.distributed.launch --nproc_per_node=4 --use_env main.py --backbone resnet50 --ytvos_path /mnt/data/ytvis/ --masks --pretrained_weights ../VisTR/<deformable_detr_coco_r50>.pth
 ```
 ### Inference
 
@@ -70,72 +78,26 @@ python -m torch.distributed.launch --nproc_per_node=4 --use_env main.py --backbo
 python inference.py --masks --model_path /mnt/data/exps/r50_def_enc_VisTR/checkpoint0059.pth --save_path /mnt/data/exps/results.json --img_path /mnt/data/ytvis/valid/JPEGImages/ --ann_path /mnt/data/ytvis/valid_vis_codelab.json  --backbone resnet50
 ```
 
-### Models
-
-We provide baseline VisTR models, and plan to include more in future. AP is computed on YouTubeVIS dataset by submitting the result json file to the [CodeLab](https://competitions.codalab.org/competitions/20128#results) system, and inference time is calculated by pure model inference time (without data-loading and post-processing).
-
-   <table>
-     <thead>
-       <tr style="text-align: right;">
-         <th></th>
-         <th>name</th>
-         <th>backbone</th>
-         <th>FPS</th>
-         <th>mask AP</th>
-         <th>model</th>
-         <th>result json zip</th>
-         <th>detailed AP </th>
-       </tr>
-     </thead>
-     <tbody>
-       <tr>
-         <th>0</th>
-         <td>VisTR</td>
-         <td>R50</td>
-         <td>69.9</td>
-         <td>36.2</td>
-         <td><a href="https://drive.google.com/file/d/10lfe_QJSoZJzcJKxWoxt67QbJG35X55e/view?usp=sharing">vistr_r50.pth </a></td>
-         <td><a href="https://drive.google.com/file/d/1vnZvxFR94EQ5TsrWixe368WMnqJ2KHIv/view?usp=sharing">vistr_r50.zip</a></td>
-       <td><p align="center">
-<img src="https://user-images.githubusercontent.com/16319629/115868905-b4686e00-a46f-11eb-9fe0-c9170026fca9.png" width="100">
-
-
-</p></td>
-       </tr>
-       <tr>
-         <th>1</th>
-         <td>VisTR</td>
-         <td>R101</td>
-         <td>57.7</td>
-         <td>40.1</td>
-         <td><a href="https://drive.google.com/file/d/1WTkrpbITPsjVQESaetgI-nPyjQybRc2M/view?usp=sharing">vistr_r101.pth </a></td>
-         <td><a href="https://drive.google.com/file/d/1bfZO3MNF9e0aO0W8vwnALsf_m84lCFfb/view?usp=sharing">vistr_r101.zip</a></td>
-       <td>
-          <p align="center">
-<img src="https://user-images.githubusercontent.com/16319629/115869052-e974c080-a46f-11eb-92e3-1778aad83c71.png" width="100">
-</p>
-</td>
-       </tr>
-   </table>
-
 
 ### License
 
-VisTR is released under the Apache 2.0 license. Please see the [LICENSE](LICENSE) file for more information.
+DefVIS is released under the Apache 2.0 license. Please see the [LICENSE](LICENSE) file for more information.
 
 ### Acknowledgement
-We would like to thank the [DETR](https://github.com/facebookresearch/detr) open-source project for its awesome work, part of the code are modified from its project.
+We would like to thank the [Deformable DETR](https://github.com/fundamentalvision/Deformable-DETR.git) open-source project for its awesome work, part of the code are modified from its project.
 
 ### Citation
 
 Please consider citing our paper in your publications if the project helps your research. BibTeX reference is as follow.
 
 ```
-@inproceedings{wang2020end,
-  title={End-to-End Video Instance Segmentation with Transformers},
-  author={Wang, Yuqing and Xu, Zhaoliang and Wang, Xinlong and Shen, Chunhua and Cheng, Baoshan and Shen, Hao and Xia, Huaxia},
-  booktitle =  {Proc. IEEE Conf. Computer Vision and Pattern Recognition (CVPR)},
-  year={2021}
+@inproceedings{yarram2022deformable,
+  title={Deformable vistr: Spatio temporal deformable attention for video instance segmentation},
+  author={Yarram, Sudhir and Wu, Jialian and Ji, Pan and Xu, Yi and Yuan, Junsong},
+  booktitle={ICASSP 2022-2022 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)},
+  pages={3303--3307},
+  year={2022},
+  organization={IEEE}
 }
 ```
 
